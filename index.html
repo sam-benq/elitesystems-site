@@ -21,7 +21,7 @@ body{
 }
 img,canvas{max-width:100%}
 .wrap{max-width:1240px;margin:0 auto;padding:0 32px}
-@media(max-width:600px){.wrap{padding:0 16px}}
+@media(max-width:600px){.wrap{padding:0 20px}}
 a{color:inherit;text-decoration:none}
 .mono{font-family:'Geist Mono',monospace}
 
@@ -49,13 +49,15 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:6
 .btn-ghost:hover{background:rgba(255,255,255,.05)}
 
 /* HERO */
-.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:64px;align-items:center;padding:80px 0;border-bottom:1px solid var(--b1);position:relative;overflow:hidden}
+.hero{padding:80px 0;border-bottom:1px solid var(--b1);position:relative;overflow:hidden}
 .hero .glyph-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.28;z-index:0;display:block}
 .hero-glow{position:absolute;inset:0;background:radial-gradient(700px 280px at 30% 0%,rgba(8,145,178,.12),transparent 70%);pointer-events:none;z-index:0}
+.hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:64px;align-items:center}
 .hero-copy{position:relative;z-index:1}
 .hero-media{position:relative;z-index:1}
 @media(max-width:900px){
-  .hero .glyph-canvas{opacity:.3}
+  .hero{padding:48px 0}
+  .hero-inner{grid-template-columns:1fr;gap:32px}
 }
 @media(max-width:600px){
   .hero-glow{background:radial-gradient(300px 500px at 80% 20%,rgba(34,211,238,.12),transparent 60%);animation:glowPulse 8s ease-in-out infinite}
@@ -88,7 +90,6 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:6
 .pr-item .big{font-size:32px;font-weight:700;color:var(--txt);margin-bottom:6px;letter-spacing:-.64px}
 .pr-item .sub{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--txt3)}
 
-.wrap{width:min(1200px,92vw);margin:0 auto}
 /* sections */
 section{padding:100px 0}
 .sec-head{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end;margin-bottom:56px}
@@ -194,10 +195,10 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
 
 @media(max-width:900px){
-  .hero{grid-template-columns:1fr;gap:40px;padding:56px 0}
+  .hero{padding:48px 0}
+  .hero-inner{grid-template-columns:1fr;gap:32px}
   .hero-media{grid-template-columns:1fr 1fr 1fr;gap:12px}
   .hero-media img{height:180px}
-  .hero{overflow:hidden}
   .hero-stats div b{font-size:24px}
   .sec-head{grid-template-columns:1fr}
   .cap-grid,.client-grid{grid-template-columns:1fr}
@@ -208,7 +209,15 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
   .footer-top{grid-template-columns:1fr;gap:32px}
   .navlinks{display:none}
   .hero-stats{gap:20px}
-  .wrap{padding:0 20px}
+}
+@media(max-width:600px){
+  nav .wrap{height:56px}
+  .status-dot{display:none}
+  .nav-right .btn{font-size:12px;padding:8px 14px}
+  .brand .word{font-size:14px}
+  .hero-media{grid-template-columns:1fr;gap:12px}
+  .hero-media img{height:200px}
+  .hero-stats{flex-wrap:wrap;gap:16px}
 }
 </style>
 </head>
@@ -233,7 +242,8 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 <header class="hero">
   <div class="hero-glow" aria-hidden="true"></div>
   <canvas class="glyph-canvas" id="gcanvas" aria-hidden="true"></canvas>
-  <div class="hero-copy">
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
     <div class="eyebrow">Elite Systems s.p. · Lenart, Slovenija · od 2024</div>
     <h1>Od ideje do<br>delujočega <span class="grad">sistema.</span></h1>
     <div class="rule"></div>
@@ -252,6 +262,7 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     <div class="hero-photo rv"><img src="images/hero-server.webp" alt="Serverji"><span class="label">Varni sistemi</span></div>
     <div class="hero-photo rv"><img src="images/hero-datacenter.webp" alt="Datacenter"><span class="label">Oblačna infrastruktura</span></div>
     <div class="hero-photo rv"><img src="images/hero-telecom.webp" alt="Terensko delo"><span class="label">Telekom inteligenca</span></div>
+    </div>
   </div>
 </header>
 
