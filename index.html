@@ -223,20 +223,39 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
   .brand .word{font-size:14px}
   .hero-media{
     display:flex;
-    gap:10px;
-    overflow-x:auto;
-    scroll-snap-type:x mandatory;
+    gap:8px;
     padding-bottom:4px;
-    -webkit-overflow-scrolling:touch
+    touch-action:pan-y
   }
-  .hero-media::-webkit-scrollbar{display:none}
   .hero-photo{
-    flex:0 0 78%;
-    aspect-ratio:16/10;
-    scroll-snap-align:center
+    position:relative;
+    flex:1 1 0;
+    aspect-ratio:3/4;
+    min-width:0;
+    overflow:hidden;
+    cursor:pointer;
+    transition:flex .35s cubic-bezier(.4,0,.2,1), border-color .25s ease, box-shadow .25s ease;
+    border:1px solid var(--b2);
+    border-radius:6px
   }
-  .hero-photo img{height:100%;object-fit:cover}
-  .hero-photo .label{font-size:9px;letter-spacing:.18em;padding:3px 7px;bottom:10px;left:10px}
+  .hero-photo.is-expanded{
+    flex:2.6 1 0;
+    border-color:rgba(34,211,238,.45);
+    box-shadow:0 0 18px rgba(34,211,238,.12)
+  }
+  .hero-photo:not(.is-expanded) .label{opacity:.55}
+  .hero-photo img{height:100%;object-fit:cover;transition:transform .5s ease}
+  .hero-photo.is-expanded img{transform:scale(1.03)}
+  .hero-photo .label{
+    font-size:9px;
+    letter-spacing:.16em;
+    padding:4px 7px;
+    bottom:9px;
+    left:9px;
+    white-space:nowrap;
+    transition:opacity .25s ease
+  }
+  .hero-photo.is-expanded .label{opacity:1}
   .hero-stats{flex-wrap:wrap;gap:16px}
 }
 </style>
@@ -470,6 +489,28 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); rv.unobserve(e.target); } });
   }, { threshold: .18 });
   document.querySelectorAll('.hero-photo,.cap-card,.client-card').forEach(function(el){ el.classList.add('rv'); rv.observe(el); });
+})();
+(function(){
+  // Mobile hero image accordion
+  var photos = Array.prototype.slice.call(document.querySelectorAll('.hero-photo'));
+  if (!photos.length || window.innerWidth > 600) return;
+
+  function expand(index){
+    photos.forEach(function(p, i){
+      p.classList.toggle('is-expanded', i === index);
+    });
+  }
+
+  photos.forEach(function(p, i){
+    p.setAttribute('role', 'button');
+    p.setAttribute('tabindex', '0');
+    p.setAttribute('aria-label', p.querySelector('.label') ? p.querySelector('.label').textContent : '');
+    p.addEventListener('click', function(){ expand(i); });
+    p.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); expand(i); } });
+  });
+
+  // Expand the first image by default
+  expand(0);
 })();
 </script>
 <script>
