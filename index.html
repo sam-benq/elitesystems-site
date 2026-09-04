@@ -173,17 +173,20 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
 
 @media(max-width:900px){
-  .hero,.split,.case-study{grid-template-columns:1fr;gap:40px}
-  .hero{padding:56px 0}
-  .sec-head{grid-template-columns:1fr}
-  .cap-grid,.client-grid{grid-template-columns:1fr}
+  .hero{grid-template-columns:1fr;gap:32px;padding:48px 0 32px}
+  .hero-media{grid-template-columns:1fr;gap:16px}
+  .hero-stats{flex-direction:column;gap:16px}
+  .hero-stats div b{font-size:24px}
   .proof-rail{flex-direction:column;gap:24px;border-bottom:none}
   .pr-item{border-right:none;border-bottom:1px solid var(--b1);padding:0 0 24px 0}
   .pr-item:last-child{border-bottom:none;padding-bottom:0}
+  .sec-head{grid-template-columns:1fr;gap:16px}
+  .cap-grid,.client-grid{grid-template-columns:1fr}
   .cta{flex-direction:column;align-items:flex-start}
   .footer-top{grid-template-columns:1fr;gap:32px}
   .navlinks{display:none}
-  .hero-stats{gap:20px}
+  .status-dot{display:none}
+  .logo .word{font-size:14px}
 }
 </style>
 </head>
