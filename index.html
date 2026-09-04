@@ -479,31 +479,43 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     var tick = function(){
       var r = wrap.getBoundingClientRect();
       var vh = window.innerHeight;
-      // prog starts when wrap enters viewport (top), reaches 1 when wrap's center passes viewport center,
-      // then extends to ~1.25 so CTA reveal has runway
-      var prog;
-      if (r.top >= vh) prog = 0;
-      else if (r.bottom <= 0) prog = 1.25;
-      else prog = Math.max(0, Math.min(1.25, (vh * .5 - r.top) / (r.height + vh * .3)));
-      var f = prog * (items.length - 1);
-      var i0 = Math.floor(f);
-      var i1 = Math.min(items.length - 1, i0 + 1);
-      var t = f - i0;
-      var y = centers[i0] + (i1 < centers.length ? (centers[i1] - centers[i0]) * t : 0);
-
-      var lit = false;
-      var dotY = y;
-      if (f >= items.length - 1 && ctaY > 0){
-        var over = Math.min(1, (f - (items.length - 1)) / 1.2);
-        dotY = y + (ctaY - y) * over;
-        if (over > 0.6) lit = true;
+      var stop = document.getElementById('plctastop');
+      var sr = stop ? stop.getBoundingClientRect() : null;
+      var reached = false, lit = false, dotY = 0;
+      if (sr){
+        // dot at last checkpoint center
+        dotY = centers[items.length - 1];
+        // CTA reveal fires when stop crosses into upper-middle of viewport (around 40% from top)
+        var reachLine = vh * 0.4;
+        if (sr.top <= reachLine){
+          // distance the stop is above the reach line, normalized to ~half viewport
+          var past = Math.min(1, (reachLine - sr.top) / (vh * 0.35));
+          dotY = dotY + (ctaY - dotY) * past;
+          if (past > 0.5) lit = true;
+          reached = true;
+        }
+      }
+      // before CTA reveal: drive dot through checkpoints based on wrap position
+      var f = window.__pldebug.lastF || 0;
+      if (!reached){
+        var prog;
+        if (r.top >= vh) prog = 0;
+        else if (r.bottom <= 0) prog = 1;
+        else prog = Math.max(0, Math.min(1, (vh * .5 - r.top) / (r.height + vh * .3)));
+        f = prog * (items.length - 1);
+        var i0 = Math.floor(f);
+        var i1 = Math.min(items.length - 1, i0 + 1);
+        var t = f - i0;
+        dotY = centers[i0] + (i1 < centers.length ? (centers[i1] - centers[i0]) * t : 0);
+        window.__pldebug.lastF = f;
+      } else {
+        window.__pldebug.lastF = items.length - 1 + past;
       }
       fill.style.height = dotY + 'px';
       dot.style.transform = 'translateY(' + (dotY - 9) + 'px)';
       dot.classList.toggle('over-cta', lit);
       wrap.classList.toggle('lit', lit);
       window.__pldebug.lastY = dotY;
-      window.__pldebug.lastF = f;
 
       items.forEach(function(it, i){
         it.classList.toggle('on', i <= Math.round(f));
