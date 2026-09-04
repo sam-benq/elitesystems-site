@@ -500,15 +500,17 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 
       // Path: straight down through checkpoints, into the CTA stop (same x), then curve right to button left edge.
       // Stop center x = 21 (matches centerline). Button left edge x = whatever the button is.
-      var stopEl = document.getElementById('plctastop');
+      var x0 = 21;
+      var yStart = centers[0];
+      var yLast = centers[items.length - 1];
       var btnEl = document.getElementById('plcta');
       var wrapRect = wrap.getBoundingClientRect();
-      var xBtn = 21;
+      var xBtn = x0;
       var yBtn = ctaY;
       if (btnEl){
         var br = btnEl.getBoundingClientRect();
-        xBtn = (br.left - wrapRect.left) - 6; // 6px before button left edge
-        yBtn = (br.top - wrapRect.top) + br.height / 2; // vertical middle of button
+        xBtn = (br.left - wrapRect.left) - 6;
+        yBtn = (br.top - wrapRect.top) + br.height / 2;
       }
 
       // Line: down through checkpoints to stop, then Bezier curve right to button entry
@@ -518,9 +520,10 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 
       bgPath.setAttribute('d', d);
       progPath.setAttribute('d', d);
-      var totalLen = progPath.getTotalLength();
+      var measured = progPath.getTotalLength();
       var straightLen = ctaY - yStart;
       pathLen = straightLen;
+      totalLen = measured;
       window.__pldebug.pathLen = pathLen;
       window.__pldebug.totalLen = totalLen;
       window.__pldebug.xBtn = xBtn;
