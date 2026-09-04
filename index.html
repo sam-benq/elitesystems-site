@@ -55,10 +55,9 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:6
 .hero-copy{position:relative;z-index:1}
 .hero-media{position:relative;z-index:1}
 @media(max-width:900px){
-  .hero .glyph-canvas{opacity:.15}
+  .hero .glyph-canvas{opacity:.3}
 }
 @media(max-width:600px){
-  .hero .glyph-canvas{display:none}
   .hero-glow{background:radial-gradient(300px 500px at 80% 20%,rgba(34,211,238,.12),transparent 60%);animation:glowPulse 8s ease-in-out infinite}
 }
 @keyframes glowPulse{
@@ -451,9 +450,13 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     var rect = canvas.parentElement.getBoundingClientRect();
     dpr = window.devicePixelRatio || 1;
     W = rect.width; H = rect.height;
-    canvas.width = Math.max(1, W * dpr); canvas.height = Math.max(1, H * dpr);
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-    fontSize = Math.round(14 * dpr);
+    canvas.width = Math.max(1, Math.round(W * dpr));
+    canvas.height = Math.max(1, Math.round(H * dpr));
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    // draw everything in CSS pixels; scale via transform once
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    fontSize = 14;
     cols = Math.max(1, Math.floor(W / (fontSize * 1.6)));
     rows = Math.max(1, Math.floor(H / (fontSize * 1.4)));
   }
@@ -478,7 +481,7 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 
   var t0 = performance.now();
   function draw(){
-    ctx.clearRect(0,0,W*dpr,H*dpr);
+    ctx.clearRect(0,0,W,H);
     ctx.font = fontSize + 'px monospace';
     ctx.textBaseline = 'top';
 
@@ -516,9 +519,11 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     requestAnimationFrame(loop);
   }
 
-  // initial resize after layout
+  // initial resize after layout; re-check once everything (fonts/images) has loaded
   requestAnimationFrame(function(){ resize(); buildGrid(); loop(); });
   window.addEventListener('resize', function(){ resize(); buildGrid(); });
+  window.addEventListener('orientationchange', function(){ setTimeout(function(){ resize(); buildGrid(); }, 300); });
+  window.addEventListener('load', function(){ resize(); buildGrid(); });
 })();
 </script>
 
