@@ -176,8 +176,10 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 
 @media(max-width:900px){
   .hero{grid-template-columns:1fr;gap:40px;padding:56px 0}
-  .hero-media{grid-template-columns:1fr 1fr 1fr;gap:16px}
-  .hero-media img{height:220px}
+  .hero-media{grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .hero-media img{height:180px}
+  .hero-stats{flex-direction:row;gap:24px;flex-wrap:wrap}
+  .hero-stats div b{font-size:24px}
   .sec-head{grid-template-columns:1fr}
   .cap-grid,.client-grid{grid-template-columns:1fr}
   .proof-rail{flex-direction:column;gap:24px;border-bottom:none}
@@ -187,6 +189,7 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
   .footer-top{grid-template-columns:1fr;gap:32px}
   .navlinks{display:none}
   .hero-stats{gap:20px}
+  .wrap{padding:0 20px}
 }
 </style>
 </head>
@@ -456,6 +459,7 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
   function draw(){
     ctx.clearRect(0,0,W*dpr,H*dpr);
     ctx.font = fontSize + 'px monospace';
+    ctx.textBaseline = 'top';
 
     var elapsed = (performance.now() - t0)/1000;
 
@@ -463,23 +467,21 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
       for (var y=0; y<rows; y++){
         var cell = grid[x][y];
 
-        // change glyph randomly when elapsed passes nextChange
         if (elapsed > cell.nextChange){
           cell.c = GLYPHS[Math.floor(Math.random()*GLYPHS.length)];
-          cell.nextChange = elapsed + Math.random() * 2; // change every 0.5-2s
+          cell.nextChange = elapsed + Math.random() * 2;
         }
 
-        // alpha cycle
         var alpha = .5 + .5 * Math.sin(elapsed * .6 + (x+y) * .3);
         alpha *= .35;
 
-        // radial fade from center outward
         var cx = W/2, cy = H/2;
         var dx = x/(cols-1)*W - cx;
         var dy = y/(rows-1)*H - cy;
         var r = Math.sqrt(dx*dx + dy*dy);
         var rf = Math.max(0, 1 - r/(Math.min(W,H)*0.45));
 
+        if (alpha * rf < .02) continue;
         ctx.fillStyle = COLORS[(x+y)%COLORS.length];
         ctx.globalAlpha = alpha * rf;
         ctx.fillText(cell.c, x * fontSize * 1.6, y * fontSize * 1.4);
