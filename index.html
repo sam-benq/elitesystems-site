@@ -561,17 +561,16 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
       var vh = window.innerHeight;
       var center = vh * .5;
       var prog = Math.max(0, Math.min(1, (center - r.top) / r.height));
-      fill.style.height = (prog * 100) + '%';
-      
       var f = prog * (items.length - 1);
       var i0 = Math.floor(f);
       var i1 = Math.min(items.length - 1, i0 + 1);
       var t = f - i0;
       var y = centers[i0] + (i1 < centers.length ? (centers[i1] - centers[i0]) * t : 0);
+      // line follows the dot, not the wrap's full height
+      fill.style.height = (y + 9) + 'px';
       dot.style.transform = 'translateY(' + (y - 9) + 'px)';
-      
-      items.forEach(function(it, i){ 
-        it.classList.toggle('on', i <= Math.round(f)); 
+      items.forEach(function(it, i){
+        it.classList.toggle('on', i <= Math.round(f));
       });
     };
     tick();
