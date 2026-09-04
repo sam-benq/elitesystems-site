@@ -567,8 +567,21 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
         f = prog * (items.length - 1);
       }
 
-      // stroke dash trick for progress: reveal portion of the path
-      var traveled = (f / (items.length - 1)) * totalLen;
+      // Map f to path length so the dot is EXACTLY at checkpoint i when f = i.
+      // Straight segment holds checkpoints 0..4 (path length at circle i = centers[i]-centers[0]);
+      // the curve into the button is the f 4..5 range.
+      var segLens = centers.map(function(c){ return c - centers[0]; });
+      var lastCkpt = segLens[segLens.length - 1];
+      var curveLen = totalLen - lastCkpt;
+      var traveled;
+      if (f <= items.length - 1){
+        var fi0 = Math.max(0, Math.floor(f));
+        var fi1 = Math.min(items.length - 1, fi0 + 1);
+        var ft = f - fi0;
+        traveled = segLens[fi0] + (segLens[fi1] - segLens[fi0]) * ft;
+      } else {
+        traveled = lastCkpt + (f - (items.length - 1)) * curveLen;
+      }
       if (traveled > totalLen) traveled = totalLen;
       progPath.style.strokeDasharray = totalLen;
       progPath.style.strokeDashoffset = totalLen - traveled;
