@@ -152,7 +152,7 @@ section{padding:100px 0}
 .pl-svg .progress-line{stroke:url(#plGradient);stroke-width:2;fill:none;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(34,211,238,.4))}
 .pl-dot{position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:var(--violet);box-shadow:0 0 14px rgba(34,211,238,.7);z-index:1;transform:translate(-50%,-50%);transition:opacity .25s ease}
 .pl-list{list-style:none;margin:0;padding:0;position:relative;z-index:2}
-.pl-item{display:grid;grid-template-columns:48px 1fr;gap:24px;padding:0 0 40px 0;opacity:.3;transform:translateX(6px);transition:opacity .3s,transform .3s}
+.pl-item{display:grid;grid-template-columns:48px 1fr;gap:24px;padding:0 0 40px 0;opacity:.55;transform:translateX(6px);transition:opacity .35s ease,transform .35s ease}
 .pl-item:last-child{padding-bottom:0}
 .pl-item.on{opacity:1;transform:none}
 .pl-item .pl-circle{width:40px;height:40px;border-radius:50%;border:2px solid var(--b2);background:var(--bg);display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;font-size:13px;font-weight:500;color:var(--txt4);transition:all .2s}
@@ -563,7 +563,7 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
         var prog;
         if (r.top >= vh) prog = 0;
         else if (r.bottom <= vh * 0.5) prog = 1;
-        else prog = Math.max(0, Math.min(1, (vh * .5 - r.top) / (r.height * 0.45)));
+        else prog = Math.max(0, Math.min(1, (vh * .5 - r.top) / (r.height * 0.85)));
         f = prog * (items.length - 1);
       }
 
@@ -591,12 +591,22 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
       });
     };
     tick();
-    window.addEventListener('scroll', function(){ requestAnimationFrame(tick); }, { passive: true });
+    var scheduleTick = function(){
+      // Call tick directly — rAF throttling on iOS can drop frames during fast scroll
+      tick();
+    };
+    window.addEventListener('scroll', scheduleTick, { passive: true });
     window.addEventListener('resize', function(){
       calcCenters();
       buildPath();
       tick();
     });
+    // iOS-friendly: also listen to touch/wheel for explicit updates
+    window.addEventListener('wheel', scheduleTick, { passive: true });
+    window.addEventListener('touchmove', scheduleTick, { passive: true });
+    // Re-tick once after fonts/images settle (layout may shift)
+    setTimeout(tick, 200);
+    setTimeout(tick, 800);
   }
 })();
 </script>
