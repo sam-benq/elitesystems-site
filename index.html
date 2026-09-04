@@ -146,9 +146,11 @@ section{padding:100px 0}
 
 /* PROCESS — scroll-driven checkpoints */
 .pl-wrap{position:relative;margin-top:32px}
-.pl-line{position:absolute;left:20px;top:0;width:2px;height:100%;background:var(--b2)}
-.pl-fill{position:absolute;left:20px;top:0;width:2px;height:0;background:linear-gradient(var(--violet),var(--violet-h));opacity:.9;box-shadow:0 0 8px rgba(34,211,238,.4)}
-.pl-dot{position:absolute;left:12px;top:0;width:18px;height:18px;border-radius:50%;background:var(--violet);box-shadow:0 0 14px rgba(34,211,238,.7);z-index:1}
+.pl-line,.pl-fill{display:none}
+.pl-svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible}
+.pl-svg .bg-line{stroke:var(--b2);stroke-width:2;fill:none}
+.pl-svg .progress-line{stroke:url(#plGradient);stroke-width:2;fill:none;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(34,211,238,.4))}
+.pl-dot{position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:var(--violet);box-shadow:0 0 14px rgba(34,211,238,.7);z-index:3;transform:translate(-50%,-50%);transition:width .25s ease,height .25s ease,margin .25s ease}
 .pl-list{list-style:none;margin:0;padding:0;position:relative;z-index:2}
 .pl-item{display:grid;grid-template-columns:48px 1fr;gap:24px;padding:0 0 40px 0;opacity:.3;transform:translateX(6px);transition:opacity .3s,transform .3s}
 .pl-item:last-child{padding-bottom:0}
@@ -328,8 +330,16 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     </div>
 
     <div class="pl-wrap" id="plwrap">
-      <div class="pl-line" id="plline"></div>
-      <div class="pl-fill" id="plfill"></div>
+      <svg class="pl-svg" id="plsvg" aria-hidden="true">
+        <defs>
+          <linearGradient id="plGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#22d3ee"/>
+            <stop offset="1" stop-color="#67e8f9"/>
+          </linearGradient>
+        </defs>
+        <path class="bg-line" id="plbgpath" d=""/>
+        <path class="progress-line" id="plprogpath" d=""/>
+      </svg>
       <div class="pl-dot" id="pldot"></div>
       <ol class="pl-list">
         <li class="pl-item"><div class="pl-circle">01</div><div class="pl-body"><b>Pregledamo</b><p>Pogovor o vašem poslovnem procesu in glavnih ozkih grlih. Brezplačno.</p></div></li>
@@ -474,48 +484,97 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
   }
 
   if (wrap && items.length){
+    var svg = document.getElementById('plsvg');
+    var bgPath = document.getElementById('plbgpath');
+    var progPath = document.getElementById('plprogpath');
+    var pathLen = 0; // total length of path up to and including last checkpoint (before CTA curve)
+    var totalLen = 0; // full length including curve to CTA
+
+    function buildPath(){
+      // measure wrap height; circles are at x≈40, y=centers[]
+      var wrapH = wrap.offsetHeight;
+      var wrapW = wrap.offsetWidth;
+      svg.setAttribute('viewBox', '0 0 ' + wrapW + ' ' + wrapH);
+      svg.setAttribute('width', wrapW);
+      svg.setAttribute('height', wrapH);
+
+      var x0 = 21; // centerline x (matches .pl-circle x)
+      var yStart = centers[0];
+      var yLast = centers[items.length - 1];
+      // curve end point: center of CTA stop (computed in CTA coords, convert to wrap-relative)
+      var stop = document.getElementById('plctastop');
+      var sw = stop ? stop.getBoundingClientRect() : null;
+      var wrapRect = wrap.getBoundingClientRect();
+      var xEnd = 21, yEnd = yLast;
+      if (sw){
+        xEnd = (sw.left - wrapRect.left) + sw.width / 2;
+        yEnd = yLast; // we'll add the curve after last checkpoint via a Q control point
+      }
+
+      // Build path: vertical line through all circles, then quadratic curve to (xEnd, ctaY)
+      var d = 'M ' + x0 + ' ' + yStart +
+              ' L ' + x0 + ' ' + yLast +
+              ' Q ' + x0 + ' ' + (yLast + 40) + ' ' + (xEnd - 20) + ' ' + (yLast + 60) +
+              ' L ' + xEnd + ' ' + (yLast + 60) +
+              ' L ' + xEnd + ' ' + ctaY;
+
+      bgPath.setAttribute('d', d);
+      progPath.setAttribute('d', d);
+      // measure path lengths
+      pathLen = progPath.getTotalLength() * (centers[items.length - 1] - yStart + 60) / (ctaY + 60 - yStart + 40);
+      // Simpler: just compute the straight-line portion length and curve portion separately
+      var straightLen = yLast - yStart;
+      var curveLen = progPath.getTotalLength() - straightLen;
+      pathLen = straightLen;
+      totalLen = straightLen + curveLen;
+      window.__pldebug.pathLen = pathLen;
+      window.__pldebug.totalLen = totalLen;
+    }
+
     calcCenters();
-    window.__pldebug = {centers: centers.slice(), lastY: -1, lastF: -1};
+    buildPath();
+    window.__pldebug = {centers: centers.slice(), lastY: -1, lastF: -1, totalLen: totalLen};
+
     var tick = function(){
-      var r = wrap.getBoundingClientRect();
       var vh = window.innerHeight;
+      var r = wrap.getBoundingClientRect();
       var stop = document.getElementById('plctastop');
       var sr = stop ? stop.getBoundingClientRect() : null;
-      var reached = false, lit = false, dotY = 0;
+      var reached = false, lit = false;
+      var f = 0;
       if (sr){
-        // dot at last checkpoint center
-        dotY = centers[items.length - 1];
-        // CTA reveal fires when stop crosses into upper-middle of viewport (around 40% from top)
         var reachLine = vh * 0.4;
         if (sr.top <= reachLine){
-          // distance the stop is above the reach line, normalized to ~half viewport
-          var past = Math.min(1, (reachLine - sr.top) / (vh * 0.35));
-          dotY = dotY + (ctaY - dotY) * past;
-          if (past > 0.5) lit = true;
+          var past = Math.min(1, (reachLine - sr.top) / (vh * 0.4));
+          f = (items.length - 1) + past;
           reached = true;
+          if (past > 0.5) lit = true;
         }
       }
-      // before CTA reveal: drive dot through checkpoints based on wrap position
-      var f = window.__pldebug.lastF || 0;
       if (!reached){
         var prog;
         if (r.top >= vh) prog = 0;
         else if (r.bottom <= 0) prog = 1;
         else prog = Math.max(0, Math.min(1, (vh * .5 - r.top) / (r.height + vh * .3)));
         f = prog * (items.length - 1);
-        var i0 = Math.floor(f);
-        var i1 = Math.min(items.length - 1, i0 + 1);
-        var t = f - i0;
-        dotY = centers[i0] + (i1 < centers.length ? (centers[i1] - centers[i0]) * t : 0);
-        window.__pldebug.lastF = f;
-      } else {
-        window.__pldebug.lastF = items.length - 1 + past;
       }
-      fill.style.height = dotY + 'px';
-      dot.style.transform = 'translateY(' + (dotY - 9) + 'px)';
+
+      // stroke dash trick for progress: reveal portion of the path
+      var traveled = (f / (items.length - 1)) * totalLen;
+      progPath.style.strokeDasharray = totalLen;
+      progPath.style.strokeDashoffset = totalLen - traveled;
+
+      // dot position along the path
+      var pt = progPath.getPointAtLength(Math.min(traveled, totalLen));
+      dot.style.left = pt.x + 'px';
+      dot.style.top = pt.y + 'px';
+
       dot.classList.toggle('over-cta', lit);
       wrap.classList.toggle('lit', lit);
-      window.__pldebug.lastY = dotY;
+
+      window.__pldebug.lastF = f;
+      window.__pldebug.lastY = pt.y;
+      window.__pldebug.traveled = traveled;
 
       items.forEach(function(it, i){
         it.classList.toggle('on', i <= Math.round(f));
@@ -523,7 +582,11 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     };
     tick();
     window.addEventListener('scroll', function(){ requestAnimationFrame(tick); }, { passive: true });
-    window.addEventListener('resize', function(){ calcCenters(); tick(); });
+    window.addEventListener('resize', function(){
+      calcCenters();
+      buildPath();
+      tick();
+    });
   }
 })();
 </script>
