@@ -560,7 +560,7 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
         var prog;
         if (r.top >= vh) prog = 0;
         else if (r.bottom <= vh * 0.5) prog = 1;
-        else prog = Math.max(0, Math.min(1, (vh * .5 - r.top) / (r.height * 0.7)));
+        else prog = Math.max(0, Math.min(1, (vh * .5 - r.top) / (r.height * 0.45)));
         f = prog * (items.length - 1);
       }
 
