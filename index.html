@@ -479,8 +479,12 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     var tick = function(){
       var r = wrap.getBoundingClientRect();
       var vh = window.innerHeight;
-      var center = vh * .5;
-      var prog = Math.max(0, Math.min(1, (center - r.top) / r.height));
+      // prog starts when wrap enters viewport (top), reaches 1 when wrap's center passes viewport center,
+      // then extends to ~1.25 so CTA reveal has runway
+      var prog;
+      if (r.top >= vh) prog = 0;
+      else if (r.bottom <= 0) prog = 1.25;
+      else prog = Math.max(0, Math.min(1.25, (vh * .5 - r.top) / (r.height + vh * .3)));
       var f = prog * (items.length - 1);
       var i0 = Math.floor(f);
       var i1 = Math.min(items.length - 1, i0 + 1);
