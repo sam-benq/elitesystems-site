@@ -514,15 +514,19 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
         yBtn = (br.top - wrapRect.top) + br.height / 2;
       }
 
-      // Line: down through checkpoints to stop, then Bezier curve right to button entry
+      // Path: straight down through all checkpoints to button center y, then smooth Bezier
+      // quarter-turn into the left-center of the button.
+      // First go down, then curve right at the button's vertical midpoint.
+      var yDown = yBtn; // arrive at button's vertical center
+      var xEntry = (btnEl ? (btnEl.getBoundingClientRect().left - wrapRect.left) : xBtn);
       var d = 'M ' + x0 + ' ' + yStart +
-              ' L ' + x0 + ' ' + ctaY +
-              ' C ' + x0 + ' ' + (ctaY + 30) + ', ' + xBtn + ' ' + (ctaY + 30) + ', ' + xBtn + ' ' + yBtn;
+              ' L ' + x0 + ' ' + yDown +
+              ' C ' + x0 + ' ' + (yDown + 0.001) + ', ' + xEntry + ' ' + yDown + ', ' + xBtn + ' ' + yBtn;
 
       bgPath.setAttribute('d', d);
       progPath.setAttribute('d', d);
       var measured = progPath.getTotalLength();
-      var straightLen = ctaY - yStart;
+      var straightLen = yDown - yStart;
       pathLen = straightLen;
       totalLen = measured;
       window.__pldebug.pathLen = pathLen;
@@ -555,8 +559,8 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
       if (!reached){
         var prog;
         if (r.top >= vh) prog = 0;
-        else if (r.bottom <= 0) prog = 1;
-        else prog = Math.max(0, Math.min(1, (vh * .5 - r.top) / (r.height + vh * .3)));
+        else if (r.bottom <= vh * 0.5) prog = 1;
+        else prog = Math.max(0, Math.min(1, (vh * .5 - r.top) / (r.height * 0.7)));
         f = prog * (items.length - 1);
       }
 
