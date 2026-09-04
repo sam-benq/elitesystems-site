@@ -514,25 +514,27 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
         yBtn = (br.top - wrapRect.top) + br.height / 2;
       }
 
-      // Path: straight down through all checkpoints to button center y, then smooth Bezier
-      // quarter-turn into the left-center of the button.
-      // First go down, then curve right at the button's vertical midpoint.
-      var yDown = yBtn; // arrive at button's vertical center
-      var xEntry = (btnEl ? (btnEl.getBoundingClientRect().left - wrapRect.left) : xBtn);
+      // Path: straight down through all checkpoints to a small distance above the button center,
+      // then a quarter-circle arc (Q with control at the inner corner), then a short horizontal segment into the button.
+      var cornerRadius = 22; // radius of the rounded corner
+      var yTurnStart = yBtn - cornerRadius; // start curving here
+      var xTurnEnd = x0 + cornerRadius;     // end curving here
       var d = 'M ' + x0 + ' ' + yStart +
-              ' L ' + x0 + ' ' + yDown +
-              ' C ' + x0 + ' ' + (yDown + 0.001) + ', ' + xEntry + ' ' + yDown + ', ' + xBtn + ' ' + yBtn;
+              ' L ' + x0 + ' ' + yTurnStart +
+              ' Q ' + x0 + ' ' + yBtn + ', ' + xTurnEnd + ' ' + yBtn +
+              ' L ' + xBtn + ' ' + yBtn;
 
       bgPath.setAttribute('d', d);
       progPath.setAttribute('d', d);
       var measured = progPath.getTotalLength();
-      var straightLen = yDown - yStart;
+      var straightLen = yTurnStart - yStart;
       pathLen = straightLen;
       totalLen = measured;
       window.__pldebug.pathLen = pathLen;
       window.__pldebug.totalLen = totalLen;
       window.__pldebug.xBtn = xBtn;
       window.__pldebug.yBtn = yBtn;
+      window.__pldebug.cornerRadius = cornerRadius;
     }
 
     calcCenters();
@@ -547,13 +549,14 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
       var reached = false, lit = false;
       var f = 0;
       if (cr){
-        // Trigger CTA reveal when the button crosses into upper-middle of viewport
+        // Trigger CTA reveal when the button crosses into upper-middle of viewport.
+        // Light up the moment the curve begins (past > 0).
         var reachLine = vh * 0.4;
         if (cr.top <= reachLine){
           var past = Math.min(1, (reachLine - cr.top) / (vh * 0.4));
           f = (items.length - 1) + past;
           reached = true;
-          if (past > 0.5) lit = true;
+          lit = true; // light up immediately as curve begins
         }
       }
       if (!reached){
