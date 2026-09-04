@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elite Systems — Razvoj in digitalne rešitve</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090a; --bg2:#0f1011; --surf:#191a1b;
+  --txt:#f7f8f8; --txt2:#d0d6e0; --txt3:#8a8f98; --txt4:#62666d;
+  --indigo:#0891b2; --violet:#22d3ee; --violet-h:#67e8f9;
+  --b1:rgba(255,255,255,.05); --b2:rgba(255,255,255,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Geist',system-ui,sans-serif;
+  background:var(--bg); color:var(--txt2);
+  -webkit-font-smoothing:antialiased; line-height:1.5;
+}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+a{color:inherit;text-decoration:none}
+.mono{font-family:'Geist Mono',monospace}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:50;background:rgba(8,9,10,.72);backdrop-filter:blur(16px);border-bottom:1px solid var(--b1)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .mark{width:26px;height:26px;position:relative;flex-shrink:0}
+.brand .mark::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#22d3ee,#0891b2);clip-path:polygon(0 100%, 50% 0, 100% 0, 50% 40%, 0 40%)}
+.brand .mark::after{content:"";position:absolute;top:12px;left:5px;right:5px;height:2px;background:var(--txt)}
+.brand .word{font-size:16px;font-weight:600;letter-spacing:-.01em;color:var(--txt)}
+.brand .word em{font-style:normal;color:var(--violet)}
+.navlinks{display:flex;gap:32px;font-size:13px;font-weight:500;letter-spacing:.02em;color:var(--txt2)}
+.navlinks a{position:relative;padding-bottom:4px}
+.navlinks a::after{content:"";position:absolute;left:0;bottom:-4px;width:100%;height:1px;background:linear-gradient(90deg,var(--violet),var(--violet-h));transform:scaleX(0);transform-origin:left;transition:transform .18s ease}
+.navlinks a:hover{color:var(--txt)}
+.navlinks a:hover::after{transform:scaleX(1)}
+.nav-right{display:flex;gap:14px;align-items:center}
+.status-dot{font-size:11px;font-weight:500;letter-spacing:.04em;color:var(--txt4);display:flex;align-items:center;gap:7px}
+.status-dot .dot{width:6px;height:6px;border-radius:50%;background:var(--violet);box-shadow:0 0 6px rgba(34,211,238,.7)}
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:590;letter-spacing:.01em;border-radius:6px;padding:10px 18px;transition:.15s;cursor:pointer;font-family:inherit;border:1px solid transparent}
+.btn-primary{background:var(--indigo);color:#fff;box-shadow:0 0 0 1px rgba(103,232,249,.22),0 2px 8px rgba(8,145,178,.22)}
+.btn-primary:hover{background:var(--violet-h);box-shadow:0 0 0 1px rgba(103,232,249,.3),0 2px 12px rgba(8,145,178,.3)}
+.btn-ghost{background:rgba(255,255,255,.02);border-color:var(--b2);color:var(--txt)}
+.btn-ghost:hover{background:rgba(255,255,255,.05)}
+
+/* HERO */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:64px;align-items:center;padding:80px 0;border-bottom:1px solid var(--b1);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(700px 280px at 30% 0%,rgba(8,145,178,.08),transparent 70%);pointer-events:none}
+.hero .glyph-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.35}
+.hero-copy{position:relative;z-index:1}
+.hero-copy .eyebrow{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--violet);margin-bottom:24px}
+.hero-copy h1{font-size:clamp(44px,6vw,72px);font-weight:800;letter-spacing:-2.16px;line-height:.98;color:var(--txt);margin-bottom:16px}
+.hero-copy h1 .grad{background:linear-gradient(90deg,var(--violet),var(--violet-h));-webkit-background-clip:text;background-clip:text;color:transparent;display:block}
+.rule{width:64px;height:2px;background:var(--violet);opacity:.8;margin:24px 0}
+.hero-copy .sub{font-size:17px;font-weight:400;line-height:1.6;color:var(--txt2);max-width:520px;margin-bottom:32px}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap}
+
+/* hero media — 3 photos with labels */
+.hero-media{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.hero-photo{position:relative;border:1px solid var(--b2);border-radius:6px;overflow:hidden;aspect-ratio:2/3}
+.hero-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-photo .label{position:absolute;bottom:12px;left:12px;font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--txt);background:rgba(8,9,10,.72);border:1px solid var(--b1);padding:4px 8px;border-radius:3px;backdrop-filter:blur(4px)}
+
+/* hero stats — left rail */
+.hero-stats{display:flex;gap:32px;margin-top:36px;padding-top:28px;border-top:1px solid var(--b1)}
+.hero-stats div b{font-size:20px;font-weight:600;color:var(--txt);display:block;margin-bottom:2px}
+.hero-stats div span{font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--txt4)}
+
+/* proof rail */
+.proof-rail{display:flex;gap:0;padding:48px 0;border-bottom:1px solid var(--b1)}
+.pr-item{flex:1;padding:0 32px;border-right:1px solid var(--b1)}
+.pr-item:last-child{border-right:none}
+.pr-item .big{font-size:32px;font-weight:700;color:var(--txt);margin-bottom:6px;letter-spacing:-.64px}
+.pr-item .sub{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--txt3)}
+
+/* sections */
+section{padding:100px 0}
+.sec-head{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end;margin-bottom:56px}
+.sec-head h2{font-size:clamp(32px,4vw,44px);font-weight:700;letter-spacing:-.88px;line-height:1.08;color:var(--txt)}
+.sec-head p{font-size:16px;color:var(--txt2);max-width:420px;margin-bottom:4px}
+.kicker{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--violet);font-family:'Geist Mono',monospace;margin-bottom:16px}
+
+/* capabilities */
+.cap-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cap-card{background:var(--bg2);border:1px solid var(--b1);border-radius:8px;padding:32px;transition:border-color .15s}
+.cap-card:hover{border-color:rgba(34,211,238,.4)}
+.cap-card .n{font-family:'Geist Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.16em;color:var(--violet);margin-bottom:20px}
+.cap-card h3{font-size:21px;font-weight:600;letter-spacing:-.42px;color:var(--txt);margin-bottom:12px}
+.cap-card p{font-size:15px;line-height:1.6;color:var(--txt2);margin-bottom:20px}
+.cap-card a{display:inline-flex;gap:6px;font-size:13px;font-weight:500;color:var(--txt2)}
+.cap-card a:hover{color:var(--violet-h)}
+.cap-card a .arrow{font-size:13px}
+
+/* split section */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;padding:0 0 100px;border-bottom:1px solid var(--b1)}
+.split .media{border:1px solid var(--b2);border-radius:6px;overflow:hidden}
+.split .media img{width:100%;height:auto;display:block}
+.split .copy .eyebrow{color:var(--violet);margin-bottom:16px}
+.split .copy h2{font-size:32px;font-weight:700;letter-spacing:-.64px;color:var(--txt);margin-bottom:16px}
+.split .copy p{font-size:16px;line-height:1.6;color:var(--txt2);margin-bottom:24px}
+.inline-steps{display:flex;gap:24px;margin-bottom:32px}
+.inline-steps span{font-size:14px;color:var(--txt2)}
+.inline-steps b{font-weight:600;color:var(--txt);margin-right:8px}
+
+/* clients */
+.client-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.client-card{border:1px solid var(--b1);border-radius:6px;padding:28px;background:var(--bg2)}
+.client-card .tag{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--violet);margin-bottom:14px}
+.client-card b{display:block;font-size:19px;font-weight:600;letter-spacing:-.38px;color:var(--txt);margin-bottom:8px}
+.client-card p{font-size:14px;color:var(--txt2);line-height:1.55}
+
+/* case study */
+.case-study{display:grid;grid-template-columns:1fr 1fr;gap:64px;padding:0 0 100px;border-bottom:1px solid var(--b1)}
+.case-copy .eyebrow{color:var(--violet);margin-bottom:16px}
+.case-copy h2{font-size:32px;font-weight:700;letter-spacing:-.64px;color:var(--txt);margin-bottom:16px}
+.case-copy p{font-size:16px;line-height:1.6;color:var(--txt2);margin-bottom:24px}
+.case-stats{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.case-stats div{border:1px solid var(--b1);border-radius:6px;padding:24px;background:var(--bg2)}
+.case-stats b{display:block;font-size:26px;font-weight:700;color:var(--txt);margin-bottom:4px;letter-spacing:-.52px}
+.case-stats span{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--txt3)}
+
+/* PROCESS — scroll-driven checkpoints */
+.pl-wrap{position:relative;margin-top:32px}
+.pl-line{position:absolute;left:20px;top:0;width:2px;height:100%;background:var(--b2)}
+.pl-fill{position:absolute;left:20px;top:0;width:2px;height:0;background:linear-gradient(var(--violet),var(--violet-h));opacity:.9;box-shadow:0 0 8px rgba(34,211,238,.4)}
+.pl-dot{position:absolute;left:12px;top:0;width:18px;height:18px;border-radius:50%;background:var(--violet);box-shadow:0 0 14px rgba(34,211,238,.7);z-index:1}
+.pl-list{list-style:none;margin:0;padding:0;position:relative;z-index:2}
+.pl-item{display:grid;grid-template-columns:48px 1fr;gap:24px;padding:0 0 40px 0;opacity:.3;transform:translateX(6px);transition:opacity .3s,transform .3s}
+.pl-item:last-child{padding-bottom:0}
+.pl-item.on{opacity:1;transform:none}
+.pl-item .pl-circle{width:40px;height:40px;border-radius:50%;border:2px solid var(--b2);background:var(--bg);display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;font-size:13px;font-weight:500;color:var(--txt4);transition:all .2s}
+.pl-item.on .pl-circle{border-color:var(--violet);color:var(--violet-h);box-shadow:0 0 12px rgba(34,211,238,.4)}
+.pl-item .pl-body b{display:block;font-size:18px;font-weight:600;letter-spacing:-.36px;color:var(--txt2);margin-bottom:4px;transition:color .2s}
+.pl-item p{font-size:14px;color:var(--txt3);line-height:1.55;max-width:560px}
+.pl-item.on .pl-body b{color:var(--txt)}
+.pl-item.on p{color:var(--txt2)}
+.proces-cta{margin-top:32px}
+
+@media(max-width:900px){
+  .pl-item{grid-template-columns:40px 1fr;gap:16px;padding-bottom:32px}
+  .pl-item .pl-circle{width:36px;height:36px}
+}
+
+/* CTA */
+.cta{display:flex;justify-content:space-between;align-items:center;gap:32px;padding:64px 0 100px}
+.cta h2{font-size:34px;font-weight:700;letter-spacing:-.68px;color:var(--txt);}
+.cta p{font-size:16px;color:var(--txt2);margin-top:10px}
+.cta .eyebrow{color:var(--violet);margin-bottom:14px}
+
+/* pricing */
+.ptable{border:1px solid var(--b2);border-radius:8px;background:var(--bg2);overflow:hidden}
+.prow{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--b1);transition:background .15s}
+.prow:last-child{border-bottom:none}
+.prow:hover{background:rgba(34,211,238,.04)}
+.prow .l b{display:block;font-size:15px;font-weight:600;color:var(--txt)}
+.prow .l span{font-size:13px;color:var(--txt4)}
+.prow .p{font-family:'Geist Mono',monospace;font-size:13.5px;font-weight:500;white-space:nowrap;color:var(--txt)}
+
+/* footer */
+footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
+.footer-top{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-top h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--txt);margin-bottom:16px}
+.footer-top a,.footer-top p,.footer-top span{display:block;font-size:14px;color:var(--txt2);padding:6px 0}
+.footer-btm{display:flex;justify-content:space-between;font-size:12.5px;color:var(--txt3);border-top:1px solid var(--b1);padding-top:32px}
+.footer-motto{display:flex;gap:8px;font-size:11px;letter-spacing:.04em;color:var(--txt3);margin-top:12px}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+
+@media(max-width:900px){
+  .hero,.split,.case-study{grid-template-columns:1fr;gap:40px}
+  .hero{padding:56px 0}
+  .sec-head{grid-template-columns:1fr}
+  .cap-grid,.client-grid{grid-template-columns:1fr}
+  .proof-rail{flex-direction:column;gap:24px;border-bottom:none}
+  .pr-item{border-right:none;border-bottom:1px solid var(--b1);padding:0 0 24px 0}
+  .pr-item:last-child{border-bottom:none;padding-bottom:0}
+  .cta{flex-direction:column;align-items:flex-start}
+  .footer-top{grid-template-columns:1fr;gap:32px}
+  .navlinks{display:none}
+  .hero-stats{gap:20px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="brand"><span class="mark"></span><span class="word">Elite <em>Systems</em></span></a>
+    <div class="navlinks">
+      <a href="#storitve">Storitve</a>
+      <a href="#proces">Kako delamo</a>
+      <a href="#reference">Reference</a>
+      <a href="#cenik">Cenik</a>
+    </div>
+    <div class="nav-right">
+      <span class="status-dot"><span class="dot"></span>Sistem online</span>
+      <a href="#kontakt" class="btn btn-primary">Brezplačen pogovor →</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <canvas class="glyph-canvas" id="gcanvas" aria-hidden="true"></canvas>
+  <div class="hero-copy">
+    <div class="eyebrow">Elite Systems s.p. · Lenart, Slovenija · od 2024</div>
+    <h1>Od ideje do<br>delujočega <span class="grad">sistema.</span></h1>
+    <div class="rule"></div>
+    <p class="sub">Enostavna digitalizacija za majhna in srednja podjetja: najprej pogledamo vaš proces, potem zgradimo, kar ga resnično rešuje.</p>
+    <div class="cta-row">
+      <a href="#kontakt" class="btn btn-primary">Pogovor →</a>
+      <a href="#kontakt" class="btn btn-ghost">Kaj smo rešili za druge</a>
+    </div>
+    <div class="hero-stats">
+      <div><b>3+</b><span>sistemi v produkciji</span></div>
+      <div><b>od 590 €</b><span>spletne strani</span></div>
+      <div><b>od 59 €/mes</b><span>vzdrževanje</span></div>
+    </div>
+  </div>
+  <div class="hero-media">
+    <div class="hero-photo rv"><img src="images/hero-server.webp" alt="Serverji"><span class="label">Varni sistemi</span></div>
+    <div class="hero-photo rv"><img src="images/hero-datacenter.webp" alt="Datacenter"><span class="label">Oblačna infrastruktura</span></div>
+    <div class="hero-photo rv"><img src="images/hero-telecom.webp" alt="Terensko delo"><span class="label">Telekom inteligenca</span></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="proof-rail">
+    <div class="pr-item"><div class="big">25+</div><div class="sub">let izkušenj</div></div>
+    <div class="pr-item"><div class="big">3+</div><div class="sub">sistemi v produkciji</div></div>
+    <div class="pr-item"><div class="big">End-to-end</div><div class="sub">tehnološke storitve</div></div>
+  </div>
+</div>
+
+<section id="storitve">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Tri načine, kako rešimo vaš problem</div>
+        <h2>Kaj vam pomagamo rešiti.</h2>
+      </div>
+      <p>Najprej pogledamo vaš proces, potem zgradimo, kar ga resnično rešuje.</p>
+    </div>
+    <div class="cap-grid">
+      <article class="cap-card rv">
+        <span class="n">01</span>
+        <h3>Razvoj programske opreme</h3>
+        <p>Poslovne aplikacije po meri, skladiščni sistemi, avtomatizacija procesov in integracije med sistemi.</p>
+        <a href="#">Preberite sposobnost <span class="arrow">→</a></a>
+      </article>
+      <article class="cap-card rv">
+        <span class="n">02</span>
+        <h3>Splet in e-commerce</h3>
+        <p>Poslovne spletne strani, Shopify/WooCommerce trgovine, SEO in optimizacija prodaje.</p>
+        <a href="#">Preberite sposobnost <span class="arrow">→</a></a>
+      </article>
+      <article class="cap-card rv">
+        <span class="n">03</span>
+        <h3>Digitalni marketing</h3>
+        <p>Google in Meta oglasi, copywriting, email kampanje in merjenje rezultatov.</p>
+        <a href="#">Preberite sposobnost <span class="arrow">→</a></a>
+      </article>
+      <article class="cap-card rv">
+        <span class="n">04</span>
+        <h3>AI in avtomatizacija</h3>
+        <p>AI-rešitve, analitika in automatizacija ponavljajočih se opravil za učinkovitejše poslovanje.</p>
+        <a href="#">Preberite sposobnost <span class="arrow">→</a></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="proces">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Način dela</div>
+        <h2>Kako pridemo do rezultata.</h2>
+      </div>
+      <p>Gradimo rešitve okrog vašega procesa, merimo tisto, kar šteje, in izboljšujemo brez dodajanja nepotrebne kompleksnosti.</p>
+    </div>
+
+    <div class="pl-wrap" id="plwrap">
+      <div class="pl-line" id="plline"></div>
+      <div class="pl-fill" id="plfill"></div>
+      <div class="pl-dot" id="pldot"></div>
+      <ol class="pl-list">
+        <li class="pl-item"><div class="pl-circle">01</div><div class="pl-body"><b>Pregledamo</b><p>Pogovor o vašem poslovnem procesu in glavnih ozkih grlih. Brezplačno.</p></div></li>
+        <li class="pl-item"><div class="pl-circle">02</div><div class="pl-body"><b>Predlagamo rešitev</b><p>Konkreten predlog: obseg, roki, fiksna cena. Vse dogovorjeno vnaprej.</p></div></li>
+        <li class="pl-item"><div class="pl-circle">03</div><div class="pl-body"><b>Razvijemo</b><p>Izdelava rešitve s tedenskim poročilom o napredku.</p></div></li>
+        <li class="pl-item"><div class="pl-circle">04</div><div class="pl-body"><b>Uvedemo</b><p>Testiranje in namestitev pri vas, z usposabljanjem ekipe.</p></div></li>
+        <li class="pl-item"><div class="pl-circle">05</div><div class="pl-body"><b>Optimiziramo</b><p>Merjenje rezultatov, SEO, oglaševanje in nadaljnji razvoj.</p></div></li>
+      </ol>
+    </div>
+
+    <div class="proces-cta">
+      <a href="#kontakt" class="btn btn-primary">Pogovor →</a>
+    </div>
+  </div>
+</section>
+
+<section id="partnerji">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Že rešeno</div>
+        <h2>Podjetja, ki so že videla rezultat.</h2>
+      </div>
+      <p>Delamo z orodji in ponudniki, ki jih vaši sistemi že uporabljajo.</p>
+    </div>
+    <div class="client-grid">
+      <div class="client-card"><span class="tag">AC/DC d.o.o.</span><b>FixIO</b><p>Interni servisni informacijski sistem.</p></div>
+      <div class="client-card"><span class="tag">Gradbeništvo</span><b>TimeFlow</b><p>Digitalni dnevniki in obračun.</p></div>
+      <div class="client-card"><span class="tag">Trgovina</span><b>Skladiščna aplikacija</b><p>Zaloge, inventura, analitika prodaje.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap case-study">
+  <div class="case-copy">
+    <div class="eyebrow">Že deluje</div>
+    <h2>Od papirnatih dnevnikov<br>do obračuna v enem dnevu.</h2>
+    <p>Gradbeno podjetje z več kot 30 terenskimi delavci je ročno vodilo dnevnike in obračune. TimeFlow je digitaliziral vse — od prijave na gradbišču do zaračunavanja — in skrajšal obračun iz treh dni na enega.</p>
+    <a href="#kontakt" class="btn btn-primary">Pogovorite se z nami →</a>
+    </div>
+  <div class="case-stats">
+    <div><b>30+</b><span>terenskih delavcev</span></div>
+    <div><b>3 dni → 1 dan</b><span>skrajšan obračun</span></div>
+    <div><b>100%</b><span>digitalizirani dnevniki</span></div>
+    <div><b>0</b><span>papirnih evidenc</span></div>
+  </div>
+</div>
+
+<section id="cenik">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Cenik</div>
+        <h2>Okvirne cene — brez presenečenj.</h2>
+      </div>
+      <p>Končno ponudbo oblikujemo po kratki analizi. To so izhodiščne vrednosti.</p>
+    </div>
+    <div class="ptable">
+      <div class="prow"><div class="l"><b>Osnovna spletna stran</b><span>Predstavitev, kontakt, osnovni SEO</span></div><div class="p">od 590 €</div></div>
+      <div class="prow"><div class="l"><b>Profesionalna poslovna stran</b><span>Podstrani, blog, analitika</span></div><div class="p">890–1.290 €</div></div>
+      <div class="prow"><div class="l"><b>Shopify trgovina</b><span>Vzpostavitev, plačila, dostava, SEO</span></div><div class="p">990–1.590 €</div></div>
+      <div class="prow"><div class="l"><b>WooCommerce trgovina</b><span>Večja prilagodljivost, lastništvo podatkov</span></div><div class="p">1.190–1.690 €</div></div>
+      <div class="prow"><div class="l"><b>Poslovna aplikacija po meri</b><span>Po analizi zahtev — fiksna cena vnaprej</span></div><div class="p">od 1.500 €</div></div>
+      <div class="prow"><div class="l"><b>Vzdrževanje in marketing</b><span>Posodobitve, SEO, vodenje oglaševanja</span></div><div class="p">59–450 € / mes</div></div>
+    </div>
+    <p style="text-align:center;font-size:13px;color:var(--txt3);margin-top:20px">Večji sistemi: cena po analizi. Dogovorimo se pred začetkom.</p>
+  </div>
+</section>
+
+<section id="kontakt">
+  <div class="wrap cta">
+    <div>
+      <div class="eyebrow">Premaknimo stvari naprej</div>
+      <h2>Kje bi radi reševali<br>vaš naslednji problem?</h2>
+      <p>Ne prodajamo predlog — najprej pogledamo vaš proces, potem zgradimo, kar ga rešuje.</p>
+      </div>
+      <a href="#" class="btn btn-primary" style="padding:16px 32px;font-size:14px">Pogovor →</a>
+      </div>
+</section>
+
+<footer>
+  <div class="wrap footer-top">
+    <div>
+      <div class="brand" style="margin-bottom:12px"><span class="mark"></span><span class="word">Elite <em>Systems</em></span></div>
+      <p>Razvijamo, analiziramo in optimiziramo digitalne rešitve za podjetja.</p>
+      <div class="footer-motto">Analiza. Razvoj. Optimizacija.</div>
+    </div>
+    <div>
+      <h3>Podjetje</h3>
+      <a href="#storitve">Storitve</a>
+      <a href="#proces">Kako delamo</a>
+      <a href="#reference">Reference</a>
+      <a href="#cenik">Cenik</a>
+    </div>
+    <div>
+      <h3>Storitve</h3>
+      <a href="#">Razvoj programske opreme</a>
+      <a href="#">Splet in e-commerce</a>
+      <a href="#">Digitalni marketing</a>
+    </div>
+    <div>
+      <h3>Kontakt</h3>
+      <a href="mailto:info@elitesystems.si">info@elitesystems.si</a>
+      <p>Lenart, Slovenija</p>
+    </div>
+  </div>
+  <div class="wrap footer-btm">
+    <span>© 2026 Elite Systems s.p. Vse pravice pridržane.</span>
+    <span class="mono">info@elitesystems.si</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var rv = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); rv.unobserve(e.target); } });
+  }, { threshold: .18 });
+  document.querySelectorAll('.hero-photo,.cap-card,.client-card').forEach(function(el){ el.classList.add('rv'); rv.observe(el); });
+})();
+</script>
+<script>
+(function(){
+  // Kimi Work-inspired: sparse, sparse grid, subtle, animated
+  var canvas = document.getElementById('gcanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W, H, cols, rows, fontSize, dpr;
+
+  // terminal glyphs — mix of code and math
+  var GLYPHS = '<>|[]{}()+=_-*#:;·~.,/\u0394\u03BB\u03C0\u221E\u221A\u2211\u2202\u00B7'.split('');
+  var COLORS = ['#22d3ee','#67e8f9','#f7f8f8','#8a8f98','#0891b2'];
+
+  function resize(){
+    dpr = window.devicePixelRatio || 1;
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    fontSize = Math.round(14 * dpr);
+    cols = Math.floor(W / (fontSize * 1.6));
+    rows = Math.floor(H / (fontSize * 1.4));
+  }
+
+  // each cell: glyph, opacity, decay, and next change time
+  var grid = [];
+  function resetCell(x, y){
+    return {
+      c: GLYPHS[Math.floor(Math.random()*GLYPHS.length)],
+      nextChange: Math.random() * 2 // when to randomly change glyph (seconds)
+    };
+  }
+  function buildGrid(){
+    grid = [];
+    for (var x=0; x<cols; x++){
+      grid[x] = [];
+      for (var y=0; y<rows; y++){
+        grid[x][y] = resetCell(x,y);
+      }
+    }
+  }
+
+  var t0 = performance.now();
+  function draw(){
+    ctx.clearRect(0,0,W*dpr,H*dpr);
+    ctx.font = fontSize + 'px monospace';
+
+    var elapsed = (performance.now() - t0)/1000;
+
+    for (var x=0; x<cols; x++){
+      for (var y=0; y<rows; y++){
+        var cell = grid[x][y];
+
+        // change glyph randomly when elapsed passes nextChange
+        if (elapsed > cell.nextChange){
+          cell.c = GLYPHS[Math.floor(Math.random()*GLYPHS.length)];
+          cell.nextChange = elapsed + Math.random() * 2; // change every 0.5-2s
+        }
+
+        // alpha cycle
+        var alpha = .5 + .5 * Math.sin(elapsed * .6 + (x+y) * .3);
+        alpha *= .35;
+
+        // radial fade from center outward
+        var cx = W/2, cy = H/2;
+        var dx = x/(cols-1)*W - cx;
+        var dy = y/(rows-1)*H - cy;
+        var r = Math.sqrt(dx*dx + dy*dy);
+        var rf = Math.max(0, 1 - r/(Math.min(W,H)*0.45));
+
+        ctx.fillStyle = COLORS[(x+y)%COLORS.length];
+        ctx.globalAlpha = alpha * rf;
+        ctx.fillText(cell.c, x * fontSize * 1.6, y * fontSize * 1.4);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function loop(){
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  resize(); buildGrid(); loop();
+  window.addEventListener('resize', function(){ resize(); buildGrid(); });
+})();
+</script>
+
+<script>
+(function(){
+  // Scroll-driven process timeline
+  var wrap = document.getElementById('plwrap');
+  var fill = document.getElementById('plfill');
+  var dot = document.getElementById('pldot');
+  var items = wrap ? Array.prototype.slice.call(wrap.querySelectorAll('.pl-item')) : [];
+  var centers = [];
+  
+  function calcCenters(){
+    centers = [];
+    items.forEach(function(it){
+      var circle = it.querySelector('.pl-circle');
+      centers.push(circle.getBoundingClientRect().top - wrap.getBoundingClientRect().top + circle.offsetHeight/2);
+    });
+  }
+  
+  if (wrap && items.length){
+    calcCenters();
+    var tick = function(){
+      var r = wrap.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var center = vh * .5;
+      var prog = Math.max(0, Math.min(1, (center - r.top) / r.height));
+      fill.style.height = (prog * 100) + '%';
+      
+      var f = prog * (items.length - 1);
+      var i0 = Math.floor(f);
+      var i1 = Math.min(items.length - 1, i0 + 1);
+      var t = f - i0;
+      var y = centers[i0] + (i1 < centers.length ? (centers[i1] - centers[i0]) * t : 0);
+      dot.style.transform = 'translateY(' + (y - 9) + 'px)';
+      
+      items.forEach(function(it, i){ 
+        it.classList.toggle('on', i <= Math.round(f)); 
+      });
+    };
+    tick();
+    window.addEventListener('scroll', function(){ requestAnimationFrame(tick); }, { passive: true });
+    window.addEventListener('resize', function(){ calcCenters(); tick(); });
+  }
+})();
+</script>
+
+</body>
+</html>
