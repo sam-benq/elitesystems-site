@@ -561,11 +561,12 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 
       // stroke dash trick for progress: reveal portion of the path
       var traveled = (f / (items.length - 1)) * totalLen;
+      if (traveled > totalLen) traveled = totalLen;
       progPath.style.strokeDasharray = totalLen;
       progPath.style.strokeDashoffset = totalLen - traveled;
 
       // dot position along the path
-      var pt = progPath.getPointAtLength(Math.min(traveled, totalLen));
+      var pt = progPath.getPointAtLength(traveled);
       dot.style.left = pt.x + 'px';
       dot.style.top = pt.y + 'px';
 
