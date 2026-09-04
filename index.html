@@ -221,8 +221,22 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
   .status-dot{display:none}
   .nav-right .btn{font-size:12px;padding:8px 14px}
   .brand .word{font-size:14px}
-  .hero-media{grid-template-columns:1fr;gap:12px}
-  .hero-media img{height:200px}
+  .hero-media{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    padding-bottom:4px;
+    -webkit-overflow-scrolling:touch
+  }
+  .hero-media::-webkit-scrollbar{display:none}
+  .hero-photo{
+    flex:0 0 78%;
+    aspect-ratio:16/10;
+    scroll-snap-align:center
+  }
+  .hero-photo img{height:100%;object-fit:cover}
+  .hero-photo .label{font-size:9px;letter-spacing:.18em;padding:3px 7px;bottom:10px;left:10px}
   .hero-stats{flex-wrap:wrap;gap:16px}
 }
 </style>
