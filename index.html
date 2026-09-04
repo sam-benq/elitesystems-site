@@ -173,20 +173,18 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
 
 @media(max-width:900px){
-  .hero{grid-template-columns:1fr;gap:32px;padding:48px 0 32px}
-  .hero-media{grid-template-columns:1fr;gap:16px}
-  .hero-stats{flex-direction:column;gap:16px}
-  .hero-stats div b{font-size:24px}
+  .hero{grid-template-columns:1fr;gap:40px;padding:56px 0}
+  .hero-media{grid-template-columns:1fr 1fr 1fr;gap:16px}
+  .hero-media img{height:220px}
+  .sec-head{grid-template-columns:1fr}
+  .cap-grid,.client-grid{grid-template-columns:1fr}
   .proof-rail{flex-direction:column;gap:24px;border-bottom:none}
   .pr-item{border-right:none;border-bottom:1px solid var(--b1);padding:0 0 24px 0}
   .pr-item:last-child{border-bottom:none;padding-bottom:0}
-  .sec-head{grid-template-columns:1fr;gap:16px}
-  .cap-grid,.client-grid{grid-template-columns:1fr}
   .cta{flex-direction:column;align-items:flex-start}
   .footer-top{grid-template-columns:1fr;gap:32px}
   .navlinks{display:none}
-  .status-dot{display:none}
-  .logo .word{font-size:14px}
+  .hero-stats{gap:20px}
 }
 </style>
 </head>
@@ -427,11 +425,11 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     var rect = canvas.parentElement.getBoundingClientRect();
     dpr = window.devicePixelRatio || 1;
     W = rect.width; H = rect.height;
-    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.width = Math.max(1, W * dpr); canvas.height = Math.max(1, H * dpr);
     canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     fontSize = Math.round(14 * dpr);
-    cols = Math.floor(W / (fontSize * 1.6));
-    rows = Math.floor(H / (fontSize * 1.4));
+    cols = Math.max(1, Math.floor(W / (fontSize * 1.6)));
+    rows = Math.max(1, Math.floor(H / (fontSize * 1.4)));
   }
 
   // each cell: glyph, opacity, decay, and next change time
