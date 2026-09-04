@@ -475,6 +475,7 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 
   if (wrap && items.length){
     calcCenters();
+    window.__pldebug = {centers: centers.slice(), lastY: -1, lastF: -1};
     var tick = function(){
       var r = wrap.getBoundingClientRect();
       var vh = window.innerHeight;
@@ -497,6 +498,8 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
       dot.style.transform = 'translateY(' + (dotY - 9) + 'px)';
       dot.classList.toggle('over-cta', lit);
       wrap.classList.toggle('lit', lit);
+      window.__pldebug.lastY = dotY;
+      window.__pldebug.lastF = f;
 
       items.forEach(function(it, i){
         it.classList.toggle('on', i <= Math.round(f));
