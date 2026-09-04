@@ -584,8 +584,9 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
       window.__pldebug.traveled = traveled;
 
       items.forEach(function(it, i){
-        // During curve reveal, all items (including 05) should be lit.
-        var litIdx = reached ? (items.length - 1) : Math.round(f);
+        // Light up all items up to the current progress, including fractional positions.
+        // i.e. when f=3.5, items 0,1,2,3 are on. When f=4.1, item 4 (05) is on.
+        var litIdx = reached ? (items.length - 1) : Math.floor(f + 0.001);
         it.classList.toggle('on', i <= litIdx);
       });
     };
