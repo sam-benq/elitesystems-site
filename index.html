@@ -531,8 +531,9 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     }
 
     calcCenters();
+    window.__pldebug = {centers: centers.slice(), lastY: -1, lastF: -1};
     buildPath();
-    window.__pldebug = {centers: centers.slice(), lastY: -1, lastF: -1, totalLen: totalLen};
+    window.__pldebug.totalLen = totalLen;
 
     var tick = function(){
       var vh = window.innerHeight;
