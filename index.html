@@ -150,7 +150,7 @@ section{padding:100px 0}
 .pl-svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible}
 .pl-svg .bg-line{stroke:var(--b2);stroke-width:2;fill:none}
 .pl-svg .progress-line{stroke:url(#plGradient);stroke-width:2;fill:none;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(34,211,238,.4))}
-.pl-dot{position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:var(--violet);box-shadow:0 0 14px rgba(34,211,238,.7);z-index:3;transform:translate(-50%,-50%);transition:width .25s ease,height .25s ease,margin .25s ease}
+.pl-dot{position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:var(--violet);box-shadow:0 0 14px rgba(34,211,238,.7);z-index:1;transform:translate(-50%,-50%);transition:opacity .25s ease}
 .pl-list{list-style:none;margin:0;padding:0;position:relative;z-index:2}
 .pl-item{display:grid;grid-template-columns:48px 1fr;gap:24px;padding:0 0 40px 0;opacity:.3;transform:translateX(6px);transition:opacity .3s,transform .3s}
 .pl-item:last-child{padding-bottom:0}
@@ -162,11 +162,10 @@ section{padding:100px 0}
 .pl-item.on .pl-body b{color:var(--txt)}
 .pl-item.on p{color:var(--txt2)}
 .pl-cta-wrap{position:relative;display:flex;align-items:center;margin-left:0;padding:48px 0 8px 56px;min-height:80px}
-.pl-cta-stop{position:absolute;left:21px;top:50%;transform:translateY(-50%);width:16px;height:16px;border-radius:50%;border:2px dashed var(--b2);background:var(--bg);transition:all .3s}
-.pl-wrap.lit .pl-cta-stop{border-style:solid;border-color:var(--violet);background:var(--violet);box-shadow:0 0 12px rgba(34,211,238,.6)}
-.pl-cta{transition:transform .25s ease,box-shadow .25s ease,background .25s ease}
+.pl-cta-stop{display:none}
+.pl-cta{position:relative;transition:transform .25s ease,box-shadow .25s ease,background .25s ease;z-index:3}
 .pl-wrap.lit .pl-cta{transform:scale(1.06);box-shadow:0 0 0 4px rgba(34,211,238,.18),0 8px 24px rgba(8,145,178,.4)}
-.pl-dot.over-cta{transform-origin:center;width:24px;height:24px;margin-left:-3px;background:var(--violet-h)}
+.pl-wrap.lit .pl-dot{opacity:0}
 
 @media(max-width:900px){
   .pl-item{grid-template-columns:40px 1fr;gap:16px;padding-bottom:32px}
@@ -349,7 +348,6 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
         <li class="pl-item"><div class="pl-circle">05</div><div class="pl-body"><b>Optimiziramo</b><p>Merjenje rezultatov, SEO, oglaševanje in nadaljnji razvoj.</p></div></li>
       </ol>
       <div class="pl-cta-wrap">
-        <span class="pl-cta-stop" id="plctastop"></span>
         <a href="#kontakt" class="btn btn-primary pl-cta" id="plcta">Pogovor →</a>
       </div>
     </div>
@@ -477,9 +475,11 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
       var circle = it.querySelector('.pl-circle');
       centers.push(circle.getBoundingClientRect().top - wrap.getBoundingClientRect().top + circle.offsetHeight/2);
     });
-    var stop = document.getElementById('plctastop');
-    if (stop && cta){
-      ctaY = stop.getBoundingClientRect().top - wrap.getBoundingClientRect().top + stop.offsetHeight/2;
+    if (cta){
+      // CTA endpoint y = button top + half button height (its vertical center)
+      var br = cta.getBoundingClientRect();
+      var wr = wrap.getBoundingClientRect();
+      ctaY = (br.top - wr.top) + br.height / 2;
     }
   }
 
@@ -498,8 +498,8 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
       svg.setAttribute('width', wrapW);
       svg.setAttribute('height', wrapH);
 
-      // Path: straight down through checkpoints, into the CTA stop (same x), then curve right to button left edge.
-      // Stop center x = 21 (matches centerline). Button left edge x = whatever the button is.
+      // Path: straight down through checkpoints, then Bezier curve ending INSIDE the button.
+      // Stop center x = 21 (matches centerline). Button entry point: just inside the button's left edge.
       var x0 = 21;
       var yStart = centers[0];
       var yLast = centers[items.length - 1];
@@ -509,7 +509,8 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
       var yBtn = ctaY;
       if (btnEl){
         var br = btnEl.getBoundingClientRect();
-        xBtn = (br.left - wrapRect.left) - 6;
+        // End inside the button, ~30% from its left edge
+        xBtn = (br.left - wrapRect.left) + br.width * 0.3;
         yBtn = (br.top - wrapRect.top) + br.height / 2;
       }
 
@@ -538,14 +539,14 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     var tick = function(){
       var vh = window.innerHeight;
       var r = wrap.getBoundingClientRect();
-      var stop = document.getElementById('plctastop');
-      var sr = stop ? stop.getBoundingClientRect() : null;
+      var cr = cta ? cta.getBoundingClientRect() : null;
       var reached = false, lit = false;
       var f = 0;
-      if (sr){
+      if (cr){
+        // Trigger CTA reveal when the button crosses into upper-middle of viewport
         var reachLine = vh * 0.4;
-        if (sr.top <= reachLine){
-          var past = Math.min(1, (reachLine - sr.top) / (vh * 0.4));
+        if (cr.top <= reachLine){
+          var past = Math.min(1, (reachLine - cr.top) / (vh * 0.4));
           f = (items.length - 1) + past;
           reached = true;
           if (past > 0.5) lit = true;
@@ -569,8 +570,6 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
       var pt = progPath.getPointAtLength(traveled);
       dot.style.left = pt.x + 'px';
       dot.style.top = pt.y + 'px';
-
-      dot.classList.toggle('over-cta', lit);
       wrap.classList.toggle('lit', lit);
 
       window.__pldebug.lastF = f;
