@@ -451,6 +451,63 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 })();
 </script>
 <script>
+(function(){
+  // Scroll-driven process timeline with CTA reveal
+  var wrap = document.getElementById('plwrap');
+  var fill = document.getElementById('plfill');
+  var dot = document.getElementById('pldot');
+  var cta = document.getElementById('plcta');
+  var items = wrap ? Array.prototype.slice.call(wrap.querySelectorAll('.pl-item')) : [];
+  var centers = [];
+  var ctaY = 0;
+
+  function calcCenters(){
+    centers = [];
+    items.forEach(function(it){
+      var circle = it.querySelector('.pl-circle');
+      centers.push(circle.getBoundingClientRect().top - wrap.getBoundingClientRect().top + circle.offsetHeight/2);
+    });
+    var stop = document.getElementById('plctastop');
+    if (stop && cta){
+      ctaY = stop.getBoundingClientRect().top - wrap.getBoundingClientRect().top + stop.offsetHeight/2;
+    }
+  }
+
+  if (wrap && items.length){
+    calcCenters();
+    var tick = function(){
+      var r = wrap.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var center = vh * .5;
+      var prog = Math.max(0, Math.min(1, (center - r.top) / r.height));
+      var f = prog * (items.length - 1);
+      var i0 = Math.floor(f);
+      var i1 = Math.min(items.length - 1, i0 + 1);
+      var t = f - i0;
+      var y = centers[i0] + (i1 < centers.length ? (centers[i1] - centers[i0]) * t : 0);
+
+      var lit = false;
+      var dotY = y;
+      if (f >= items.length - 1 && ctaY > 0){
+        var over = Math.min(1, (f - (items.length - 1)) / 1.2);
+        dotY = y + (ctaY - y) * over;
+        if (over > 0.6) lit = true;
+      }
+      fill.style.height = dotY + 'px';
+      dot.style.transform = 'translateY(' + (dotY - 9) + 'px)';
+      dot.classList.toggle('over-cta', lit);
+      wrap.classList.toggle('lit', lit);
+
+      items.forEach(function(it, i){
+        it.classList.toggle('on', i <= Math.round(f));
+      });
+    };
+    tick();
+    window.addEventListener('scroll', function(){ requestAnimationFrame(tick); }, { passive: true });
+    window.addEventListener('resize', function(){ calcCenters(); tick(); });
+  }
+})();
+</script>
 <script>
 (function(){
   // Kimi Work-inspired: sparse, sparse grid, subtle, animated
