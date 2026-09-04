@@ -159,7 +159,12 @@ section{padding:100px 0}
 .pl-item p{font-size:14px;color:var(--txt3);line-height:1.55;max-width:560px}
 .pl-item.on .pl-body b{color:var(--txt)}
 .pl-item.on p{color:var(--txt2)}
-.proces-cta{margin-top:32px}
+.pl-cta-wrap{position:relative;display:flex;align-items:center;margin-left:48px;padding:48px 0 8px;min-height:80px}
+.pl-cta-stop{position:absolute;left:-28px;top:0;bottom:0;width:16px;height:16px;border-radius:50%;border:2px dashed var(--b2);background:var(--bg);transition:all .3s}
+.pl-wrap.lit .pl-cta-stop{border-style:solid;border-color:var(--violet);background:var(--violet);box-shadow:0 0 12px rgba(34,211,238,.6)}
+.pl-cta{transition:transform .25s ease,box-shadow .25s ease,background .25s ease}
+.pl-wrap.lit .pl-cta{transform:scale(1.06);box-shadow:0 0 0 4px rgba(34,211,238,.18),0 8px 24px rgba(8,145,178,.4)}
+.pl-dot.over-cta{transform-origin:center;width:24px;height:24px;margin-left:-3px;background:var(--violet-h)}
 
 @media(max-width:900px){
   .pl-item{grid-template-columns:40px 1fr;gap:16px;padding-bottom:32px}
@@ -333,10 +338,10 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
         <li class="pl-item"><div class="pl-circle">04</div><div class="pl-body"><b>Uvedemo</b><p>Testiranje in namestitev pri vas, z usposabljanjem ekipe.</p></div></li>
         <li class="pl-item"><div class="pl-circle">05</div><div class="pl-body"><b>Optimiziramo</b><p>Merjenje rezultatov, SEO, oglaševanje in nadaljnji razvoj.</p></div></li>
       </ol>
-    </div>
-
-    <div class="proces-cta">
-      <a href="#kontakt" class="btn btn-primary">Pogovor →</a>
+      <div class="pl-cta-wrap">
+        <span class="pl-cta-stop" id="plctastop"></span>
+        <a href="#kontakt" class="btn btn-primary pl-cta" id="plcta">Pogovor →</a>
+      </div>
     </div>
   </div>
 </section>
@@ -446,17 +451,15 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
 })();
 </script>
 <script>
+<script>
 (function(){
   // Kimi Work-inspired: sparse, sparse grid, subtle, animated
   var canvas = document.getElementById('gcanvas');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
   var W, H, cols, rows, fontSize, dpr;
-
-  // terminal glyphs — mix of code and math
-  var GLYPHS = '<>|[]{}()+=_-*#:;·~.,/\u0394\u03BB\u03C0\u221E\u221A\u2211\u2202\u00B7'.split('');
+  var GLYPHS = '<>|[]{}()+=_-*#:;·~.,/Δλπ∞√∑∂·'.split('');
   var COLORS = ['#22d3ee','#67e8f9','#f7f8f8','#8a8f98','#0891b2'];
-
   function resize(){
     var rect = canvas.parentElement.getBoundingClientRect();
     dpr = window.devicePixelRatio || 1;
@@ -465,20 +468,17 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     canvas.height = Math.max(1, Math.round(H * dpr));
     canvas.style.width = W + 'px';
     canvas.style.height = H + 'px';
-    // draw everything in CSS pixels; scale via transform once
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     fontSize = 14;
     cols = Math.max(1, Math.floor(W / (fontSize * 1.6)));
     rows = Math.max(1, Math.floor(H / (fontSize * 1.4)));
   }
-
-  // each cell: own random rhythm so glyphs appear/vanish independently across the whole hero
   var grid = [];
   function resetCell(x, y){
     return {
       c: GLYPHS[Math.floor(Math.random()*GLYPHS.length)],
       phase: Math.random() * Math.PI * 2,
-      speed: .25 + Math.random() * .75,   // each cell pulses at its own rate
+      speed: .25 + Math.random() * .75,
       nextChange: Math.random() * 2
     };
   }
@@ -486,35 +486,26 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     grid = [];
     for (var x=0; x<cols; x++){
       grid[x] = [];
-      for (var y=0; y<rows; y++){
-        grid[x][y] = resetCell(x,y);
-      }
+      for (var y=0; y<rows; y++) grid[x][y] = resetCell(x,y);
     }
   }
-
   var t0 = performance.now();
   function draw(){
     ctx.clearRect(0,0,W,H);
     ctx.font = fontSize + 'px monospace';
     ctx.textBaseline = 'top';
-
     var elapsed = (performance.now() - t0)/1000;
-
     for (var x=0; x<cols; x++){
       for (var y=0; y<rows; y++){
         var cell = grid[x][y];
-
         if (elapsed > cell.nextChange){
           cell.c = GLYPHS[Math.floor(Math.random()*GLYPHS.length)];
           cell.nextChange = elapsed + Math.random() * 2;
-          cell.phase = Math.random() * Math.PI * 2;   // re-randomize rhythm on swap
+          cell.phase = Math.random() * Math.PI * 2;
           cell.speed = .25 + Math.random() * .75;
         }
-
-        // independent pulse per cell — no radial mask
         var alpha = .5 + .5 * Math.sin(elapsed * cell.speed + cell.phase);
         alpha *= .4;
-
         if (alpha < .03) continue;
         ctx.fillStyle = COLORS[(x+y)%COLORS.length];
         ctx.globalAlpha = alpha;
@@ -523,60 +514,11 @@ footer{border-top:1px solid var(--b1);padding:64px 0 32px;background:var(--bg2)}
     }
     ctx.globalAlpha = 1;
   }
-
-  function loop(){
-    draw();
-    requestAnimationFrame(loop);
-  }
-
-  // initial resize after layout; re-check once everything (fonts/images) has loaded
+  function loop(){ draw(); requestAnimationFrame(loop); }
   requestAnimationFrame(function(){ resize(); buildGrid(); loop(); });
   window.addEventListener('resize', function(){ resize(); buildGrid(); });
   window.addEventListener('orientationchange', function(){ setTimeout(function(){ resize(); buildGrid(); }, 300); });
   window.addEventListener('load', function(){ resize(); buildGrid(); });
-})();
-</script>
-
-<script>
-(function(){
-  // Scroll-driven process timeline
-  var wrap = document.getElementById('plwrap');
-  var fill = document.getElementById('plfill');
-  var dot = document.getElementById('pldot');
-  var items = wrap ? Array.prototype.slice.call(wrap.querySelectorAll('.pl-item')) : [];
-  var centers = [];
-  
-  function calcCenters(){
-    centers = [];
-    items.forEach(function(it){
-      var circle = it.querySelector('.pl-circle');
-      centers.push(circle.getBoundingClientRect().top - wrap.getBoundingClientRect().top + circle.offsetHeight/2);
-    });
-  }
-  
-  if (wrap && items.length){
-    calcCenters();
-    var tick = function(){
-      var r = wrap.getBoundingClientRect();
-      var vh = window.innerHeight;
-      var center = vh * .5;
-      var prog = Math.max(0, Math.min(1, (center - r.top) / r.height));
-      var f = prog * (items.length - 1);
-      var i0 = Math.floor(f);
-      var i1 = Math.min(items.length - 1, i0 + 1);
-      var t = f - i0;
-      var y = centers[i0] + (i1 < centers.length ? (centers[i1] - centers[i0]) * t : 0);
-      // line reaches dot's center, not 9px past it
-      fill.style.height = y + 'px';
-      dot.style.transform = 'translateY(' + (y - 9) + 'px)';
-      items.forEach(function(it, i){
-        it.classList.toggle('on', i <= Math.round(f));
-      });
-    };
-    tick();
-    window.addEventListener('scroll', function(){ requestAnimationFrame(tick); }, { passive: true });
-    window.addEventListener('resize', function(){ calcCenters(); tick(); });
-  }
 })();
 </script>
 
